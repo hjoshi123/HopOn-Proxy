@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	realip "github.com/tomasen/realip"
 	"go.uber.org/zap"
 )
 
@@ -39,11 +40,12 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (p *Proxy) handleHTTP(w http.ResponseWriter, r *http.Request) {
 	p.Logger.Debug("Got HTTP request", zap.String("host", r.Host))
-
+	clientIP := realip.FromRequest(r)
 	if p.Avoid != "" && strings.Contains(r.Host, p.Avoid) == true {
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusMethodNotAllowed)
 		return
 	}
+	p.Logger.Debug("HTTP Request IP", zap.String("IP", clientIP))
 	p.ForwardHTTPProxy.ServeHTTP(w, r)
 }
 
@@ -59,8 +61,9 @@ func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-
+	clientIP := realip.FromRequest(r)
 	p.Logger.Debug("Connecting", zap.String("host", r.Host))
+	p.Logger.Debug("HTTPS Request IP", zap.String("IP", clientIP))
 
 	// dials or creates a TCP connection to the destination
 	destConn, err := net.DialTimeout("tcp", r.Host, p.DestDialTimeout)
@@ -70,7 +73,7 @@ func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p.Logger.Debug("Connected", zap.String("host", r.Host))
+	// p.Logger.Debug("Connected", zap.String("host", r.Host))
 
 	w.WriteHeader(http.StatusOK)
 
