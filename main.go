@@ -68,7 +68,7 @@ func main() {
 	}
 
 	s := &http.Server{
-		Addr:              "192.168.1.56:80",
+		Addr:              ":8080",
 		Handler:           p,
 		ReadTimeout:       *flagServerReadTimeout,
 		ReadHeaderTimeout: *flagServerReadHeaderTimeout,
