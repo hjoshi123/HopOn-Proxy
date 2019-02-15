@@ -52,7 +52,11 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error: failed to initiate logger")
 	}
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			log.Fatalln("Cannot sync log")
+		}
+	}()
 
 	stdLogger := zap.NewStdLog(logger)
 

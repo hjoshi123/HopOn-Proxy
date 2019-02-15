@@ -41,7 +41,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (p *Proxy) handleHTTP(w http.ResponseWriter, r *http.Request) {
 	p.Logger.Debug("Got HTTP request", zap.String("host", r.Host))
 	clientIP := realip.FromRequest(r)
-	if p.Avoid != "" && strings.Contains(r.Host, p.Avoid) == true {
+	if p.Avoid != "" && strings.Contains(r.Host, p.Avoid) {
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusMethodNotAllowed)
 		return
 	}
@@ -50,7 +50,7 @@ func (p *Proxy) handleHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
-	if p.Avoid != "" && strings.Contains(r.Host, p.Avoid) == true {
+	if p.Avoid != "" && strings.Contains(r.Host, p.Avoid) {
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusMethodNotAllowed)
 		return
 	}
@@ -94,10 +94,18 @@ func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now()
-	clientConn.SetReadDeadline(now.Add(p.ClientReadTimeout))
-	clientConn.SetWriteDeadline(now.Add(p.ClientWriteTimeout))
-	destConn.SetReadDeadline(now.Add(p.DestReadTimeout))
-	destConn.SetWriteDeadline(now.Add(p.DestWriteTimeout))
+	if clientConn.SetReadDeadline(now.Add(p.ClientReadTimeout)) != nil {
+		p.Logger.Error("Error in setting read deadline")
+	}
+	if clientConn.SetWriteDeadline(now.Add(p.ClientWriteTimeout)) != nil {
+		p.Logger.Error("Error in setting write deadline")
+	}
+	if destConn.SetReadDeadline(now.Add(p.DestReadTimeout)) != nil {
+		p.Logger.Error("Error in setting destination read deadline")
+	}
+	if destConn.SetWriteDeadline(now.Add(p.DestWriteTimeout)) != nil {
+		p.Logger.Error("Error in setting destination write deadline")
+	}
 
 	// streams data between client and destination
 	// Go routines stream bidirectionally by spawning two stream copiers
