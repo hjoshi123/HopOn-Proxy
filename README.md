@@ -1,4 +1,4 @@
-# HopOn Proxy for WiFi access [![Build Status](https://travis-ci.com/hjoshi123/HopOn-Proxy.svg?token=SYsx8xiDLudxiCyLpckN&branch=master)]
+# HopOn Proxy for WiFi access [![Build Status](https://travis-ci.com/hjoshi123/HopOn-Proxy.svg?token=SYsx8xiDLudxiCyLpckN&branch=master)](https://travis-ci.com/hjoshi123/HopOn-Proxy)
 
 A forwarding HTTP/S proxy for internet access using HopOn app. By Hemant Joshi.
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -12,6 +13,9 @@ import (
 	realip "github.com/tomasen/realip"
 	"go.uber.org/zap"
 )
+
+// Sum is the total amount of data consumed
+var Sum int64
 
 // Proxy is a HTTPS Forward proxy
 type Proxy struct {
@@ -74,7 +78,6 @@ func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// p.Logger.Debug("Connected", zap.String("host", r.Host))
-
 	w.WriteHeader(http.StatusOK)
 
 	p.Logger.Debug("Hijacking", zap.String("host", r.Host))
@@ -116,7 +119,11 @@ func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
 func transfer(dest io.WriteCloser, src io.ReadCloser) {
 	defer func() { _ = dest.Close() }()
 	defer func() { _ = src.Close() }()
-	_, _ = io.Copy(dest, src)
+	nr, err := io.Copy(dest, src)
+	if err != nil {
+		fmt.Println("Error in Copying")
+	}
+	Sum += nr
 }
 
 // NewForwardHTTPProxy returns a reverse proxy that take incoming request and

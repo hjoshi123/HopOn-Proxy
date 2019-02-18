@@ -128,5 +128,6 @@ func main() {
 	}
 
 	<-idleConnsClosed
+	p.Logger.Info("Total data", zap.Int64("Lol", Sum))
 	p.Logger.Info("Server stopped")
 }

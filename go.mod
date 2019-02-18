@@ -2,9 +2,10 @@ module github.com/hjoshi123/HopOn-Proxy
 
 require (
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
+	github.com/google/gopacket v1.1.16
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
-	github.com/stretchr/testify v1.3.0 // indirect
+	github.com/stretchr/testify v1.3.0
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	go.uber.org/atomic v1.3.2 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
