@@ -5,7 +5,6 @@ FROM golang:${GO_VERSION}-alpine AS builder
 
 # Create the user and group files that will be used in the running container to
 # run the process as an unprivileged user.
-RUN adduser -D -g '' appuser
 
 RUN apk update && apk add git && go get gopkg.in/natefinch/lumberjack.v2
 
@@ -29,7 +28,6 @@ RUN CGO_ENABLED=0 go build \
 FROM scratch AS final
 
 # Import the user and group files from the first stage.
-COPY --from=builder /user/group /user/passwd /etc/
 
 # Import the compiled executable from the first stage.
 COPY --from=builder /app /app
@@ -40,7 +38,6 @@ COPY --from=builder /app /app
 EXPOSE 8080
 
 # Perform any further action as an unprivileged user.
-USER appuser
 
 # Run the compiled binary.
 ENTRYPOINT [ "/app" ]
